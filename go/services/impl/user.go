@@ -75,7 +75,7 @@ type CreateContactRequest struct {
 
 func CreateContact(c *gin.Context) {
 	var request CreateContactRequest
-	err := c.Bind(&request)
+	err := c.BindJSON(&request)
 	if err != nil {
 		env.Environment.Logger.Error("Bind json error: " + err.Error())
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -100,7 +100,7 @@ func CreateContact(c *gin.Context) {
 }
 
 func DeleteContact(c *gin.Context) {
-	contactId, err := strconv.ParseInt(c.Param("contact_id"), 10, 64)
+	contactId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 	}
 
