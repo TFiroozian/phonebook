@@ -3,7 +3,7 @@ FROM golang:1.10-alpine3.8 AS build
 RUN apk add --no-cache git    
 RUN go get github.com/golang/dep/cmd/dep    
 
-COPY Gopkg.lock Gopkg.toml $GOPATH/src/github.com/tfiroozian/phonebook    
+COPY Gopkg.lock Gopkg.toml $GOPATH/src/github.com/tfiroozian/phonebook/
 WORKDIR $GOPATH/src/github.com/tfiroozian/phonebook   
 RUN dep ensure -vendor-only    
     
