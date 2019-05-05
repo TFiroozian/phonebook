@@ -19,10 +19,11 @@ func SetupRouter() *gin.Engine {
 
 	contact := router.Group("/api/v0/contacts")
 	{
-		contact.GET(":contact-id", GetContact)
-		contact.DELETE(":contact-id", DeleteContact)
 		contact.GET("", ListContact)
 		contact.POST("", CreateContact)
+		contact.GET(":contact-id", GetContact)
+		contact.DELETE(":contact-id", DeleteContact)
+		contact.PUT(":contact-id", UpdateContact)
 	}
 
 	return router

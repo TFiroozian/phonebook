@@ -3,6 +3,7 @@ package impl
 import (
 	// Go native packages
 	"context"
+	"strconv"
 
 	// Our packages
 	"github.com/tfiroozian/phonebook/go/env"
@@ -63,4 +64,26 @@ func (db *DBImpl) InsertContact(c context.Context, firstName, lastName, phoneNum
 	$2, $3, $4) RETURNING id`
 	err := db.QueryRowxContext(c, query, firstName, lastName, phoneNumber, email).Scan(&contactId)
 	return contactId, err
+}
+
+func (db *DBImpl) UpdateContact(c context.Context, id int64, firstName, lastName, phoneNumber,
+	email string) error {
+	query := `UPDATE  ` + env.ContactTable + ` SET first_name=$1, last_name=$2, phone_number=$3, 
+	email=$4 WHERE id=$5`
+	result, err := db.ExecContext(c, query, firstName, lastName, phoneNumber, email, id)
+	if err != nil {
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows != 1 {
+		env.Environment.Logger.Error("number of affected rows for updating contact with id = "+
+			strconv.FormatInt(id, 10)+"is:", strconv.FormatInt(rows, 10))
+	}
+
+	return nil
 }

@@ -128,3 +128,22 @@ func TestDeleteContactSuccessfully(t *testing.T) {
 		strconv.FormatInt(contactId, 10)), nil)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
+
+func TestUpdateContactSuccessfully(t *testing.T) {
+	defer GetEnv(t).Finish()
+	form := UpdateContactRequest{
+		FirstName:   "first-name",
+		LastName:    "last-name",
+		Email:       "first-last@gmail.com",
+		PhoneNumber: "01234567890",
+	}
+
+	var contactId int64 = 1
+	env.Environment.DataStore.(*models.MockDataStore).EXPECT().UpdateContact(gomock.Any(),
+		contactId, form.FirstName, form.LastName, form.PhoneNumber, form.Email).Return(nil)
+
+	router := SetupRouter()
+	w := performRequest(t, router, "PUT", path.Join("/api/v0/contacts",
+		strconv.FormatInt(contactId, 10)), form)
+	assert.Equal(t, http.StatusOK, w.Code)
+}

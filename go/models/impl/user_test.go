@@ -133,3 +133,26 @@ func TestSelectContactSuccessfully(t *testing.T) {
 	mock.ExpectationsWereMet()
 	assert.NoError(t, err, "error was not expected while checking expectation")
 }
+func TestUpdateContactSuccessfully(t *testing.T) {
+	db, mock, err := NewTestDB(t)
+	assert.NoError(t, err, "not expected error when opening a stub database connection")
+	defer db.Close()
+
+	var (
+		firstName   = "first-name"
+		lastName    = "last-name"
+		phoneNumber = "01234567890"
+		email       = "first-last@gmail.com"
+		contactId   = int64(1)
+	)
+
+	mock.ExpectExec(`UPDATE phone_book[.]contacts SET first_name=.+, last_name=.+, phone_number=.+, email=.+
+	WHERE id=.+`).WithArgs(firstName, lastName, phoneNumber, email, contactId).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.UpdateContact(context.TODO(), contactId, firstName, lastName, phoneNumber, email)
+	assert.NoError(t, err, "error was not expected while updating contact")
+
+	mock.ExpectationsWereMet()
+	assert.NoError(t, err, "error was not expected while checking expectation")
+}

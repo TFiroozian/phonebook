@@ -120,3 +120,43 @@ func DeleteContact(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+type UpdateContactRequest struct {
+	FirstName   string `json:"first_name" form:"first_name"`
+	LastName    string `json:"last_name" form:"last_name"`
+	PhoneNumber string `json:"phone_number" form:"phone_number"`
+	Email       string `json:"email" form:"email"`
+}
+
+func UpdateContact(c *gin.Context) {
+	var request UpdateContactRequest
+	err := c.BindJSON(&request)
+	if err != nil {
+		env.Environment.Logger.Error("Bind json error: " + err.Error())
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	contactId, err := strconv.ParseInt(c.Param("contact-id"), 10, 64)
+	if err != nil {
+		env.Environment.Logger.Error("Bind json error: " + err.Error())
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = env.Environment.DataStore.UpdateContact(c, contactId, request.FirstName,
+		request.LastName, request.PhoneNumber, request.Email)
+	if err != nil {
+		params := make(map[string]interface{})
+		params["email"] = request.Email
+		params["first-name"] = request.FirstName
+		params["last-name"] = request.LastName
+		params["phone-number"] = request.PhoneNumber
+		env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
+			"Update contact error: " + err.Error())
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
