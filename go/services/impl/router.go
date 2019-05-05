@@ -21,7 +21,6 @@ func SetupRouter() *gin.Engine {
 	{
 		contact.GET(":contact-id", GetContact)
 		contact.DELETE(":contact-id", DeleteContact)
-
 		contact.GET("", ListContact)
 		contact.POST("", CreateContact)
 	}

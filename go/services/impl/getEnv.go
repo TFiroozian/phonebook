@@ -6,7 +6,6 @@ import (
 
 	// Our packages
 	"github.com/tfiroozian/phonebook/go/env"
-	//logger "github.com/tfiroozian/phonebook/go/logger/mock"
 	models "github.com/tfiroozian/phonebook/go/models/mock"
 
 	// Dep packages
@@ -15,11 +14,6 @@ import (
 
 func GetEnv(t *testing.T) *gomock.Controller {
 	ctrl := gomock.NewController(t)
-
-	env.Environment = env.Env{
-		DataStore: models.NewMockDataStore(ctrl),
-		//Log:       logger.NewMockLogger(ctrl),
-	}
-
+	env.Environment = env.Env{DataStore: models.NewMockDataStore(ctrl)}
 	return ctrl
 }
