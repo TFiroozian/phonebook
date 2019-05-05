@@ -28,7 +28,7 @@ func TestInsertContactSuccessfully(t *testing.T) {
 		insertId    = int64(1)
 	)
 
-	mock.ExpectQuery(`INSERT INTO app[.]contact [(]first_name, last_name, phone_number, email[)]
+	mock.ExpectQuery(`INSERT INTO phone_book[.]contacts [(]first_name, last_name, phone_number, email[)]
 	VALUES[(].+[)] RETURNING id`).
 		WithArgs(firstName, lastName, phoneNumber, email).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(insertId))
@@ -48,7 +48,7 @@ func TestDeleteContactIdSuccessfully(t *testing.T) {
 
 	var contactId int64 = 1
 
-	mock.ExpectExec(`DELETE FROM app[.]contact WHERE id=.+`).
+	mock.ExpectExec(`DELETE FROM phone_book[.]contacts WHERE id=.+`).
 		WithArgs(contactId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -73,7 +73,7 @@ func TestSelectContactWithIdSuccessfully(t *testing.T) {
 	}
 
 	var contactId int64 = 1
-	mock.ExpectQuery(`SELECT id, first_name, last_name, email, phone_number FROM app.contact WHERE id=.+`).
+	mock.ExpectQuery(`SELECT id, first_name, last_name, email, phone_number FROM phone_book.contacts WHERE id=.+`).
 		WithArgs(contactId).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "first_name", "last_name",
 			"email", "phone_number"}).AddRow(contact.Id, contact.FirstName, contact.LastName,
@@ -116,7 +116,7 @@ func TestSelectContactSuccessfully(t *testing.T) {
 		phoneNumber = ""
 	)
 
-	mock.ExpectQuery(`SELECT [*] FROM app[.]contact WHERE [(].+='' OR first_name=.+[)] AND 
+	mock.ExpectQuery(`SELECT [*] FROM phone_book[.]contacts WHERE [(].+='' OR first_name=.+[)] AND 
 	[(].+='' OR last_name=.+[)] AND [(].+='' OR phone_number=.+[)] AND [(].+='' OR email=.+[)]`).
 		WithArgs(firstName, lastName, phoneNumber, email).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "first_name", "last_name",

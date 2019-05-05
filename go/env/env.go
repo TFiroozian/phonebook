@@ -17,6 +17,6 @@ var Environment Env
 
 const (
 	// In production mode we're going to read postgres schema name from k8s configmaps
-	schemaName   = "app"
-	ContactTable = schemaName + ".contact"
+	schemaName   = "phone_book"
+	ContactTable = schemaName + ".contacts"
 )
