@@ -38,17 +38,18 @@ func ListContact(c *gin.Context) {
 		params["phoneNumber"] = query.PhoneNumber
 		params["email"] = query.Email
 		env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
-			"Select contacts using query params: " + err.Error())
+			"Select contacts using query params error: " + err.Error())
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"contact": contacts})
+	c.JSON(http.StatusOK, gin.H{"contacts": contacts})
 }
 
 func GetContact(c *gin.Context) {
-	contactId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	contactId, err := strconv.ParseInt(c.Param("contact-id"), 10, 64)
 	if err != nil {
+		// For the cases that contact-id is nil
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -91,7 +92,7 @@ func CreateContact(c *gin.Context) {
 		params["phoneNumber"] = request.PhoneNumber
 		params["email"] = request.Email
 		env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
-			"Insert contacts: " + err.Error())
+			"Insert contacts error: " + err.Error())
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -100,8 +101,11 @@ func CreateContact(c *gin.Context) {
 }
 
 func DeleteContact(c *gin.Context) {
-	contactId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	contactId, err := strconv.ParseInt(c.Param("contact-id"), 10, 64)
 	if err != nil {
+		// For the cases that contact-id is nil
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
 	err = env.Environment.DataStore.DeleteContactWithId(c, contactId)
@@ -109,7 +113,7 @@ func DeleteContact(c *gin.Context) {
 		params := make(map[string]interface{})
 		params["contactId"] = contactId
 		env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
-			"Delete contact with contact id: " + err.Error())
+			"Delete contact with contact id error: " + err.Error())
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

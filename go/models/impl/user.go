@@ -16,7 +16,8 @@ func (db *DBImpl) SelectContactWithId(c context.Context, contactId int64) (*mode
 	return &contact, err
 }
 
-func (db *DBImpl) SelectContact(c context.Context, firstName, lastName, phoneNumber, email string) (*[]models.Contact, error) {
+func (db *DBImpl) SelectContact(c context.Context, firstName, lastName, phoneNumber,
+	email string) (*[]models.Contact, error) {
 	query := `SELECT * FROM ` + env.ContactTable + ` WHERE ($1='' OR first_name=$1) AND 
 	($2='' OR last_name=$2) AND ($3='' OR phone_number=$3) AND ($4='' OR email=$4)`
 	rows, err := db.QueryxContext(c, query, firstName, lastName, phoneNumber, email)
@@ -58,8 +59,8 @@ func (db *DBImpl) DeleteContactWithId(c context.Context, contactId int64) error 
 
 func (db *DBImpl) InsertContact(c context.Context, firstName, lastName, phoneNumber, email string) (int64, error) {
 	var contactId int64
-	query := `INSERT INTO ` + env.ContactTable + ` (first_name, last_name, phone_number, email) VALUES(
-		$1, $2, $3, $4) RETURNING id`
+	query := `INSERT INTO ` + env.ContactTable + ` (first_name, last_name, phone_number, email) VALUES($1,
+	$2, $3, $4) RETURNING id`
 	err := db.QueryRowxContext(c, query, firstName, lastName, phoneNumber, email).Scan(&contactId)
 	return contactId, err
 }

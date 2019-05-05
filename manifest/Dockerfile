@@ -8,7 +8,7 @@ WORKDIR $GOPATH/src/github.com/tfiroozian/phonebook
 RUN dep ensure -vendor-only    
     
 COPY go/ $GOPATH/src/github.com/tfiroozian/phonebook/go
-#RUN go test -v ./... -tags=testing
+RUN go test -v ./... -tags=testing
 RUN CGO_ENABLED=0 GOOS=linux go build -o $GOPATH/bin/sx1 -a -ldflags '-extldflags "-static"' ./go                                                                 
 FROM scratch 
 ENV GOPATH /go 
