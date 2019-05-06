@@ -1,6 +1,6 @@
 # phonebook
 
-This code contains CRUD request contacts of a phonebook. 
+This code contains CRUD request for contacts of a phonebook. 
 
 # TODO 
 1. Authorization/Authentication code
