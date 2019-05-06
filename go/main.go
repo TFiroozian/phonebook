@@ -23,5 +23,6 @@ func main() {
 	defer db.Close()
 
 	env.Environment.DataStore = db
+	env.Environment.Middlewares = new(services.MiddlewaresImpl)
 	services.SetupRouter().Run(":8080")
 }

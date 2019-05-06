@@ -35,74 +35,89 @@ func (m *MockDataStore) EXPECT() *MockDataStoreMockRecorder {
 }
 
 // SelectContactWithId mocks base method
-func (m *MockDataStore) SelectContactWithId(c context.Context, contactId int64) (*tmpl.Contact, error) {
+func (m *MockDataStore) SelectContactWithId(c context.Context, userId, contactId int64) (*tmpl.Contact, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectContactWithId", c, contactId)
+	ret := m.ctrl.Call(m, "SelectContactWithId", c, userId, contactId)
 	ret0, _ := ret[0].(*tmpl.Contact)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SelectContactWithId indicates an expected call of SelectContactWithId
-func (mr *MockDataStoreMockRecorder) SelectContactWithId(c, contactId interface{}) *gomock.Call {
+func (mr *MockDataStoreMockRecorder) SelectContactWithId(c, userId, contactId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectContactWithId", reflect.TypeOf((*MockDataStore)(nil).SelectContactWithId), c, contactId)
-}
-
-// SelectContact mocks base method
-func (m *MockDataStore) SelectContact(c context.Context, firstName, lastName, phoneNumber, email string) (*[]tmpl.Contact, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectContact", c, firstName, lastName, phoneNumber, email)
-	ret0, _ := ret[0].(*[]tmpl.Contact)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SelectContact indicates an expected call of SelectContact
-func (mr *MockDataStoreMockRecorder) SelectContact(c, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectContact", reflect.TypeOf((*MockDataStore)(nil).SelectContact), c, firstName, lastName, phoneNumber, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectContactWithId", reflect.TypeOf((*MockDataStore)(nil).SelectContactWithId), c, userId, contactId)
 }
 
 // DeleteContactWithId mocks base method
-func (m *MockDataStore) DeleteContactWithId(c context.Context, contactId int64) error {
+func (m *MockDataStore) DeleteContactWithId(c context.Context, userId, contactId int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteContactWithId", c, contactId)
+	ret := m.ctrl.Call(m, "DeleteContactWithId", c, userId, contactId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteContactWithId indicates an expected call of DeleteContactWithId
-func (mr *MockDataStoreMockRecorder) DeleteContactWithId(c, contactId interface{}) *gomock.Call {
+func (mr *MockDataStoreMockRecorder) DeleteContactWithId(c, userId, contactId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContactWithId", reflect.TypeOf((*MockDataStore)(nil).DeleteContactWithId), c, contactId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteContactWithId", reflect.TypeOf((*MockDataStore)(nil).DeleteContactWithId), c, userId, contactId)
+}
+
+// UpdateContact mocks base method
+func (m *MockDataStore) UpdateContact(c context.Context, userId, id int64, firstName, lastName, phoneNumber, email string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateContact", c, userId, id, firstName, lastName, phoneNumber, email)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateContact indicates an expected call of UpdateContact
+func (mr *MockDataStoreMockRecorder) UpdateContact(c, userId, id, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContact", reflect.TypeOf((*MockDataStore)(nil).UpdateContact), c, userId, id, firstName, lastName, phoneNumber, email)
 }
 
 // InsertContact mocks base method
-func (m *MockDataStore) InsertContact(c context.Context, firstName, lastName, phoneNumber, email string) (int64, error) {
+func (m *MockDataStore) InsertContact(c context.Context, userId int64, firstName, lastName, phoneNumber, email string) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertContact", c, firstName, lastName, phoneNumber, email)
+	ret := m.ctrl.Call(m, "InsertContact", c, userId, firstName, lastName, phoneNumber, email)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // InsertContact indicates an expected call of InsertContact
-func (mr *MockDataStoreMockRecorder) InsertContact(c, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
+func (mr *MockDataStoreMockRecorder) InsertContact(c, userId, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertContact", reflect.TypeOf((*MockDataStore)(nil).InsertContact), c, firstName, lastName, phoneNumber, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertContact", reflect.TypeOf((*MockDataStore)(nil).InsertContact), c, userId, firstName, lastName, phoneNumber, email)
 }
 
-// UpdateContact mocks base method
-func (m *MockDataStore) UpdateContact(c context.Context, id int64, firstName, lastName, phoneNumber, email string) error {
+// SelectContact mocks base method
+func (m *MockDataStore) SelectContact(c context.Context, userId int64, firstName, lastName, phoneNumber, email string) (*[]tmpl.Contact, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateContact", c, id, firstName, lastName, phoneNumber, email)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "SelectContact", c, userId, firstName, lastName, phoneNumber, email)
+	ret0, _ := ret[0].(*[]tmpl.Contact)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// UpdateContact indicates an expected call of UpdateContact
-func (mr *MockDataStoreMockRecorder) UpdateContact(c, id, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
+// SelectContact indicates an expected call of SelectContact
+func (mr *MockDataStoreMockRecorder) SelectContact(c, userId, firstName, lastName, phoneNumber, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContact", reflect.TypeOf((*MockDataStore)(nil).UpdateContact), c, id, firstName, lastName, phoneNumber, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectContact", reflect.TypeOf((*MockDataStore)(nil).SelectContact), c, userId, firstName, lastName, phoneNumber, email)
+}
+
+// SelectUserWithUsername mocks base method
+func (m *MockDataStore) SelectUserWithUsername(c context.Context, username string) (*tmpl.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUserWithUsername", c, username)
+	ret0, _ := ret[0].(*tmpl.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUserWithUsername indicates an expected call of SelectUserWithUsername
+func (mr *MockDataStoreMockRecorder) SelectUserWithUsername(c, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUserWithUsername", reflect.TypeOf((*MockDataStore)(nil).SelectUserWithUsername), c, username)
 }
