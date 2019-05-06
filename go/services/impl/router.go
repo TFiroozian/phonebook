@@ -16,7 +16,9 @@ import (
 func SetupRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
+	router.POST("/api/v0/auth/login", Login)
 
+	router.Use(JWTMiddleware())
 	contact := router.Group("/api/v0/contacts")
 	{
 		contact.GET("", ListContact)
