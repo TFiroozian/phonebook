@@ -31,10 +31,14 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func performRequest(t *testing.T, r http.Handler, method, path string,
+func performRequest(t *testing.T, r http.Handler, method, path, token string,
 	body interface{}) *httptest.ResponseRecorder {
 	if body == nil {
 		req, _ := http.NewRequest(method, path, nil)
+		if token != "" {
+			req.Header.Set("Authorization", "Bearer "+token)
+		}
+
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 		return w
@@ -42,6 +46,10 @@ func performRequest(t *testing.T, r http.Handler, method, path string,
 		j, err := json.Marshal(body)
 		assert.NoError(t, err, "NO ERROR!")
 		req, _ := http.NewRequest(method, path, strings.NewReader(string(j)))
+		if token != "" {
+			req.Header.Set("Authorization", "Bearer "+token)
+		}
+
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 		return w

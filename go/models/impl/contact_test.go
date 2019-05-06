@@ -26,14 +26,15 @@ func TestInsertContactSuccessfully(t *testing.T) {
 		phoneNumber = "01234567890"
 		email       = "first-last@gmail.com"
 		insertId    = int64(1)
+		userId      = int64(1)
 	)
 
-	mock.ExpectQuery(`INSERT INTO phone_book[.]contacts [(]first_name, last_name, phone_number, email[)]
-	VALUES[(].+[)] RETURNING id`).
-		WithArgs(firstName, lastName, phoneNumber, email).
+	mock.ExpectQuery(`INSERT INTO phone_book[.]contacts [(]first_name, last_name, phone_number, email, 
+	user_id[)] VALUES[(].+[)] RETURNING id`).
+		WithArgs(firstName, lastName, phoneNumber, email, userId).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(insertId))
 
-	contactId, err := db.InsertContact(context.TODO(), firstName, lastName, phoneNumber, email)
+	contactId, err := db.InsertContact(context.TODO(), userId, firstName, lastName, phoneNumber, email)
 	assert.NoError(t, err, "error was not expected while inserting contact")
 	assert.Equal(t, insertId, contactId, "ID must be "+strconv.FormatInt(insertId, 10))
 
@@ -47,12 +48,13 @@ func TestDeleteContactIdSuccessfully(t *testing.T) {
 	defer db.Close()
 
 	var contactId int64 = 1
+	var userId int64 = 1
 
-	mock.ExpectExec(`DELETE FROM phone_book[.]contacts WHERE id=.+`).
-		WithArgs(contactId).
+	mock.ExpectExec(`DELETE FROM phone_book[.]contacts WHERE id=.+ AND user_id=.+`).
+		WithArgs(contactId, userId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = db.DeleteContactWithId(context.TODO(), contactId)
+	err = db.DeleteContactWithId(context.TODO(), contactId, userId)
 	assert.NoError(t, err, "error was not expected while deleting contact with id")
 
 	mock.ExpectationsWereMet()
@@ -73,14 +75,16 @@ func TestSelectContactWithIdSuccessfully(t *testing.T) {
 	}
 
 	var contactId int64 = 1
-	mock.ExpectQuery(`SELECT id, first_name, last_name, email, phone_number FROM phone_book.contacts WHERE id=.+`).
-		WithArgs(contactId).
+	var userId int64 = 1
+	mock.ExpectQuery(`SELECT id, first_name, last_name, email, phone_number FROM
+	phone_book.contacts WHERE id=.+ AND user_id=.+`).
+		WithArgs(contactId, userId).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "first_name", "last_name",
 			"email", "phone_number"}).AddRow(contact.Id, contact.FirstName, contact.LastName,
 			contact.Email, contact.PhoneNumber))
 
 	contactStr, _ := json.Marshal(contact)
-	resultContact, err := db.SelectContactWithId(context.TODO(), contactId)
+	resultContact, err := db.SelectContactWithId(context.TODO(), contactId, userId)
 	assert.NoError(t, err, "error was not expected while selecting contact with id")
 	assert.Equal(t, resultContact, &contact, "contact must be "+string(contactStr))
 
@@ -114,11 +118,12 @@ func TestSelectContactSuccessfully(t *testing.T) {
 		lastName    = "last-name"
 		email       = ""
 		phoneNumber = ""
+		userId      = int64(1)
 	)
 
-	mock.ExpectQuery(`SELECT [*] FROM phone_book[.]contacts WHERE [(].+='' OR first_name=.+[)] AND 
-	[(].+='' OR last_name=.+[)] AND [(].+='' OR phone_number=.+[)] AND [(].+='' OR email=.+[)]`).
-		WithArgs(firstName, lastName, phoneNumber, email).
+	mock.ExpectQuery(`SELECT id, first_name, last_name, email FROM phone_book.contacts
+	WHERE [(].+='' OR first_name=.+[)] AND [(].+='' OR last_name=.+[)] AND [(].+='' OR phone_number=.+[)] 
+	AND [(].+='' OR email=.+[)] AND user_id=.+`).WithArgs(firstName, lastName, phoneNumber, email, userId).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "first_name", "last_name",
 			"email", "phone_number"}).AddRow(contacts[0].Id, contacts[0].FirstName,
 			contacts[0].LastName, contacts[0].Email, contacts[0].PhoneNumber).AddRow(
@@ -126,13 +131,14 @@ func TestSelectContactSuccessfully(t *testing.T) {
 			contacts[1].LastName, contacts[1].Email, contacts[1].PhoneNumber))
 
 	contactsStr, _ := json.Marshal(contacts)
-	resultContacts, err := db.SelectContact(context.TODO(), firstName, lastName, phoneNumber, email)
+	resultContacts, err := db.SelectContact(context.TODO(), userId, firstName, lastName, phoneNumber, email)
 	assert.NoError(t, err, "error was not expected while selecting contact")
 	assert.Equal(t, resultContacts, &contacts, "contacts must be "+string(contactsStr))
 
 	mock.ExpectationsWereMet()
 	assert.NoError(t, err, "error was not expected while checking expectation")
 }
+
 func TestUpdateContactSuccessfully(t *testing.T) {
 	db, mock, err := NewTestDB(t)
 	assert.NoError(t, err, "not expected error when opening a stub database connection")
@@ -144,13 +150,14 @@ func TestUpdateContactSuccessfully(t *testing.T) {
 		phoneNumber = "01234567890"
 		email       = "first-last@gmail.com"
 		contactId   = int64(1)
+		userId      = int64(1)
 	)
 
 	mock.ExpectExec(`UPDATE phone_book[.]contacts SET first_name=.+, last_name=.+, phone_number=.+, email=.+
-	WHERE id=.+`).WithArgs(firstName, lastName, phoneNumber, email, contactId).
+	WHERE id=.+ AND user_id=.+`).WithArgs(firstName, lastName, phoneNumber, email, contactId, userId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = db.UpdateContact(context.TODO(), contactId, firstName, lastName, phoneNumber, email)
+	err = db.UpdateContact(context.TODO(), userId, contactId, firstName, lastName, phoneNumber, email)
 	assert.NoError(t, err, "error was not expected while updating contact")
 
 	mock.ExpectationsWereMet()

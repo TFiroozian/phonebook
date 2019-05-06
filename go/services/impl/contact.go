@@ -2,6 +2,7 @@ package impl
 
 import (
 	// Go native packages
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -29,7 +30,8 @@ func ListContact(c *gin.Context) {
 		return
 	}
 
-	contacts, err := env.Environment.DataStore.SelectContact(c, query.FirstName, query.LastName,
+	userId := c.GetInt64("user_id")
+	contacts, err := env.Environment.DataStore.SelectContact(c, userId, query.FirstName, query.LastName,
 		query.PhoneNumber, query.Email)
 	if err != nil {
 		params := make(map[string]interface{})
@@ -54,14 +56,20 @@ func GetContact(c *gin.Context) {
 		return
 	}
 
-	contact, err := env.Environment.DataStore.SelectContactWithId(c, contactId)
+	userId := c.GetInt64("user_id")
+	contact, err := env.Environment.DataStore.SelectContactWithId(c, userId, contactId)
 	if err != nil {
-		params := make(map[string]interface{})
-		params["contactId"] = contactId
-		env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
-			"Select contact with contact Id: " + err.Error())
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		if err == sql.ErrNoRows {
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		} else {
+			params := make(map[string]interface{})
+			params["contactId"] = contactId
+			env.Environment.Logger.WithFields(logrus.Fields{"params": params}).Error(
+				"Select contact with contact Id: " + err.Error())
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"contact": contact})
@@ -83,7 +91,8 @@ func CreateContact(c *gin.Context) {
 		return
 	}
 
-	contactId, err := env.Environment.DataStore.InsertContact(c, request.FirstName,
+	userId := c.GetInt64("user_id")
+	contactId, err := env.Environment.DataStore.InsertContact(c, userId, request.FirstName,
 		request.LastName, request.PhoneNumber, request.Email)
 	if err != nil {
 		params := make(map[string]interface{})
@@ -108,7 +117,8 @@ func DeleteContact(c *gin.Context) {
 		return
 	}
 
-	err = env.Environment.DataStore.DeleteContactWithId(c, contactId)
+	userId := c.GetInt64("user_id")
+	err = env.Environment.DataStore.DeleteContactWithId(c, userId, contactId)
 	if err != nil {
 		params := make(map[string]interface{})
 		params["contactId"] = contactId
@@ -137,6 +147,7 @@ func UpdateContact(c *gin.Context) {
 		return
 	}
 
+	userId := c.GetInt64("user_id")
 	contactId, err := strconv.ParseInt(c.Param("contact-id"), 10, 64)
 	if err != nil {
 		env.Environment.Logger.Error("Bind json error: " + err.Error())
@@ -144,7 +155,7 @@ func UpdateContact(c *gin.Context) {
 		return
 	}
 
-	err = env.Environment.DataStore.UpdateContact(c, contactId, request.FirstName,
+	err = env.Environment.DataStore.UpdateContact(c, userId, contactId, request.FirstName,
 		request.LastName, request.PhoneNumber, request.Email)
 	if err != nil {
 		params := make(map[string]interface{})

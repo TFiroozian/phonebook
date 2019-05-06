@@ -10,18 +10,20 @@ import (
 	models "github.com/tfiroozian/phonebook/go/models/tmpl"
 )
 
-func (db *DBImpl) SelectContactWithId(c context.Context, contactId int64) (*models.Contact, error) {
-	query := "SELECT id, first_name, last_name, email, phone_number FROM " + env.ContactTable + " WHERE id=$1"
+func (db *DBImpl) SelectContactWithId(c context.Context, userId, contactId int64) (*models.Contact, error) {
+	query := "SELECT id, first_name, last_name, email, phone_number FROM " +
+		env.ContactTable + " WHERE id=$1 AND user_id=$2"
 	var contact models.Contact
-	err := db.QueryRowxContext(c, query, contactId).StructScan(&contact)
+	err := db.QueryRowxContext(c, query, contactId, userId).StructScan(&contact)
 	return &contact, err
 }
 
-func (db *DBImpl) SelectContact(c context.Context, firstName, lastName, phoneNumber,
+func (db *DBImpl) SelectContact(c context.Context, userId int64, firstName, lastName, phoneNumber,
 	email string) (*[]models.Contact, error) {
-	query := `SELECT * FROM ` + env.ContactTable + ` WHERE ($1='' OR first_name=$1) AND 
-	($2='' OR last_name=$2) AND ($3='' OR phone_number=$3) AND ($4='' OR email=$4)`
-	rows, err := db.QueryxContext(c, query, firstName, lastName, phoneNumber, email)
+	query := `SELECT id, first_name, last_name, email FROM ` + env.ContactTable +
+		` WHERE ($1='' OR first_name=$1) AND ($2='' OR last_name=$2) AND 
+		($3='' OR phone_number=$3) AND ($4='' OR email=$4) AND user_id=$5`
+	rows, err := db.QueryxContext(c, query, firstName, lastName, phoneNumber, email, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +42,9 @@ func (db *DBImpl) SelectContact(c context.Context, firstName, lastName, phoneNum
 	return &contacts, nil
 }
 
-func (db *DBImpl) DeleteContactWithId(c context.Context, contactId int64) error {
-	query := `DELETE FROM ` + env.ContactTable + ` WHERE id=$1`
-	result, err := db.ExecContext(c, query, contactId)
+func (db *DBImpl) DeleteContactWithId(c context.Context, userId, contactId int64) error {
+	query := `DELETE FROM ` + env.ContactTable + ` WHERE id=$1 AND user_id=$2`
+	result, err := db.ExecContext(c, query, contactId, userId)
 	if err != nil {
 		return err
 	}
@@ -58,19 +60,20 @@ func (db *DBImpl) DeleteContactWithId(c context.Context, contactId int64) error 
 	return nil
 }
 
-func (db *DBImpl) InsertContact(c context.Context, firstName, lastName, phoneNumber, email string) (int64, error) {
+func (db *DBImpl) InsertContact(c context.Context, userId int64, firstName, lastName,
+	phoneNumber, email string) (int64, error) {
 	var contactId int64
-	query := `INSERT INTO ` + env.ContactTable + ` (first_name, last_name, phone_number, email) VALUES($1,
-	$2, $3, $4) RETURNING id`
-	err := db.QueryRowxContext(c, query, firstName, lastName, phoneNumber, email).Scan(&contactId)
+	query := `INSERT INTO ` + env.ContactTable + ` (first_name, last_name, phone_number, email, user_id) 
+	VALUES($1, $2, $3, $4, $5) RETURNING id`
+	err := db.QueryRowxContext(c, query, firstName, lastName, phoneNumber, email, userId).Scan(&contactId)
 	return contactId, err
 }
 
-func (db *DBImpl) UpdateContact(c context.Context, id int64, firstName, lastName, phoneNumber,
+func (db *DBImpl) UpdateContact(c context.Context, userId, contactId int64, firstName, lastName, phoneNumber,
 	email string) error {
 	query := `UPDATE  ` + env.ContactTable + ` SET first_name=$1, last_name=$2, phone_number=$3, 
-	email=$4 WHERE id=$5`
-	result, err := db.ExecContext(c, query, firstName, lastName, phoneNumber, email, id)
+	email=$4 WHERE id=$5 AND user_id=$6`
+	result, err := db.ExecContext(c, query, firstName, lastName, phoneNumber, email, contactId, userId)
 	if err != nil {
 		return err
 	}
@@ -82,7 +85,7 @@ func (db *DBImpl) UpdateContact(c context.Context, id int64, firstName, lastName
 
 	if rows != 1 {
 		env.Environment.Logger.Error("number of affected rows for updating contact with id = "+
-			strconv.FormatInt(id, 10)+"is:", strconv.FormatInt(rows, 10))
+			strconv.FormatInt(contactId, 10)+"is:", strconv.FormatInt(rows, 10))
 	}
 
 	return nil

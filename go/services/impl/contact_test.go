@@ -28,6 +28,7 @@ func TestListContactSuccessfully(t *testing.T) {
 		PhoneNumber: "",
 	}
 
+	var userId int64 = 1
 	contacts := []structs.Contact{
 		structs.Contact{Id: 1,
 			FirstName:   "first-name",
@@ -45,10 +46,11 @@ func TestListContactSuccessfully(t *testing.T) {
 	}
 
 	env.Environment.DataStore.(*models.MockDataStore).EXPECT().SelectContact(gomock.Any(),
-		query.FirstName, query.LastName, query.PhoneNumber, query.Email).Return(&contacts, nil)
+		userId, query.FirstName, query.LastName, query.PhoneNumber, query.Email).Return(&contacts, nil)
 
 	router := SetupRouter()
-	w := performRequest(t, router, "GET", "/api/v0/contacts?first_name=first-name&last_name=last-name", nil)
+	w := performRequest(t, router, "GET", "/api/v0/contacts?first_name=first-name&last_name=last-name",
+		token, nil)
 
 	body, _ := ioutil.ReadAll(w.Result().Body)
 	m := make(map[string]interface{})
@@ -62,6 +64,7 @@ func TestListContactSuccessfully(t *testing.T) {
 func TestGetContactSuccessfully(t *testing.T) {
 	defer GetEnv(t).Finish()
 	var contactId int64 = 1
+	var userId int64 = 1
 
 	contact := structs.Contact{
 		Id:          1,
@@ -72,11 +75,11 @@ func TestGetContactSuccessfully(t *testing.T) {
 	}
 
 	env.Environment.DataStore.(*models.MockDataStore).EXPECT().SelectContactWithId(gomock.Any(),
-		contactId).Return(&contact, nil)
+		userId, contactId).Return(&contact, nil)
 
 	router := SetupRouter()
 	w := performRequest(t, router, "GET", path.Join("/api/v0/contacts",
-		strconv.FormatInt(contactId, 10)), nil)
+		strconv.FormatInt(contactId, 10)), token, nil)
 
 	body, _ := ioutil.ReadAll(w.Result().Body)
 	m := make(map[string]interface{})
@@ -99,13 +102,14 @@ func TestCreateContactSuccessfully(t *testing.T) {
 	var (
 		contactId int64 = 1
 		newId     int64 = 1
+		userId    int64 = 1
 	)
 
-	env.Environment.DataStore.(*models.MockDataStore).EXPECT().InsertContact(gomock.Any(),
+	env.Environment.DataStore.(*models.MockDataStore).EXPECT().InsertContact(gomock.Any(), userId,
 		form.FirstName, form.LastName, form.PhoneNumber, form.Email).Return(newId, nil)
 
 	router := SetupRouter()
-	w := performRequest(t, router, "POST", "/api/v0/contacts", form)
+	w := performRequest(t, router, "POST", "/api/v0/contacts", token, form)
 
 	body, _ := ioutil.ReadAll(w.Result().Body)
 	m := make(map[string]interface{})
@@ -119,13 +123,14 @@ func TestCreateContactSuccessfully(t *testing.T) {
 func TestDeleteContactSuccessfully(t *testing.T) {
 	defer GetEnv(t).Finish()
 	var contactId int64 = 1
+	var userId int64 = 1
 
-	env.Environment.DataStore.(*models.MockDataStore).EXPECT().DeleteContactWithId(gomock.Any(),
+	env.Environment.DataStore.(*models.MockDataStore).EXPECT().DeleteContactWithId(gomock.Any(), userId,
 		contactId).Return(nil)
 
 	router := SetupRouter()
 	w := performRequest(t, router, "DELETE", path.Join("/api/v0/contacts",
-		strconv.FormatInt(contactId, 10)), nil)
+		strconv.FormatInt(contactId, 10)), token, nil)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
@@ -139,11 +144,12 @@ func TestUpdateContactSuccessfully(t *testing.T) {
 	}
 
 	var contactId int64 = 1
-	env.Environment.DataStore.(*models.MockDataStore).EXPECT().UpdateContact(gomock.Any(),
+	var userId int64 = 1
+	env.Environment.DataStore.(*models.MockDataStore).EXPECT().UpdateContact(gomock.Any(), userId,
 		contactId, form.FirstName, form.LastName, form.PhoneNumber, form.Email).Return(nil)
 
 	router := SetupRouter()
 	w := performRequest(t, router, "PUT", path.Join("/api/v0/contacts",
-		strconv.FormatInt(contactId, 10)), form)
+		strconv.FormatInt(contactId, 10)), token, form)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
