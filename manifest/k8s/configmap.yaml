@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conf 
+data:
+  pb.json: |
+    {   
+      "postgres-hostname":"127.0.0.1",
+      "postgres-db-name":"app",
+      "postgres-schema-name": "phone_book",
+    }  

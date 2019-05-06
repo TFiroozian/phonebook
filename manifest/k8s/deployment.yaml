@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: phone-book
+  name: phone-book
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: phone-book
+  template:
+    metadata:
+      labels:
+        run: phone-book
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "run"
+                    operator: In
+                    values: 
+                    - phone-book
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: gcr.io/sx-1-224016/phone-book:latest
+        imagePullPolicy: Always
+        name: phone-book
+        env: 
+          - name: CONFIG_FILE
+            value: /etc/phone-book/pb.json
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: db-user-pass
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-user-pass
+                key: password    
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /etc/phone-book
+          name: config
+          readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: pb
+            items:
+            - key: conf 
+              path: pb.json    
