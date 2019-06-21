@@ -123,6 +123,22 @@
   version = "v1.3.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:b37c2770785b761ab52ea4b1335a32b8a7e36bd8f8edfc0fe996bdb064487ea1"
+  name = "github.com/tfiroozian/phonebook"
+  packages = [
+    "go/env",
+    "go/logger",
+    "go/models/impl",
+    "go/models/mock",
+    "go/models/tmpl",
+    "go/services/impl",
+    "go/services/tmpl",
+  ]
+  pruneopts = "UT"
+  revision = "3aee5f4b4c9b13c3d3420344cfda4a6a0cec8992"
+
+[[projects]]
   digest = "1:c268acaa4a4d94a467980e5e91452eb61c460145765293dc0aed48e5e9919cc6"
   name = "github.com/ugorji/go"
   packages = ["codec"]
@@ -171,6 +187,13 @@
     "github.com/lib/pq",
     "github.com/sirupsen/logrus",
     "github.com/stretchr/testify/assert",
+    "github.com/tfiroozian/phonebook/go/env",
+    "github.com/tfiroozian/phonebook/go/logger",
+    "github.com/tfiroozian/phonebook/go/models/impl",
+    "github.com/tfiroozian/phonebook/go/models/mock",
+    "github.com/tfiroozian/phonebook/go/models/tmpl",
+    "github.com/tfiroozian/phonebook/go/services/impl",
+    "github.com/tfiroozian/phonebook/go/services/tmpl",
     "gopkg.in/DATA-DOG/go-sqlmock.v1",
   ]
   solver-name = "gps-cdcl"
