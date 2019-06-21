@@ -1,3 +1,5 @@
+CREATE DATABASE app;
+
 \c app;    
 CREATE SCHEMA phone_book;    
 CREATE TABLE IF NOT EXISTS phone_book.users (    
@@ -15,3 +17,7 @@ CREATE TABLE IF NOT EXISTS phone_book.contacts (
   email VARCHAR(255) UNIQUE,
   FOREIGN KEY (user_id) REFERENCES phone_book.users(id)
 );
+
+
+INSERT INTO phone_book.users (password, username) VALUES( 'Tara', '1234567890');
+INSERT INTO phone_book.contacts (user_id, first_name, last_name, phone_number, email) VALUES(1, 'Tara', 'Firoozian', '12345678901', 'thr.firoozian@g,ail.com');
